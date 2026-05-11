@@ -36,11 +36,12 @@ body:
     attributes:
       label: Category
       options:
-        - Cloning pipeline
-        - Asset extraction
-        - Component generation
+        - Category research (Phase 0)
+        - Token extraction (Phase 1)
+        - Merge algorithm (Phase 2)
+        - Output format (DESIGN_TOKENS.md / theme.css / theme.json)
+        - Cross-agent compatibility
         - Documentation
-        - Developer experience
         - Other
 
   - type: textarea

@@ -1,65 +1,71 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
-
-# Website Reverse-Engineer Template
+# build-website-inspired
 
 ## What This Is
-A reusable template for reverse-engineering any website into a clean, modern Next.js codebase using AI coding agents. The Next.js + shadcn/ui + Tailwind v4 base is pre-scaffolded — just run `/clone-website <url1> [<url2> ...]`.
 
-## Tech Stack
-- **Framework:** Next.js 16 (App Router, React 19, TypeScript strict)
-- **UI:** shadcn/ui (Radix primitives, Tailwind CSS v4, `cn()` utility)
-- **Icons:** Lucide React (default — will be replaced/supplemented by extracted SVGs)
-- **Styling:** Tailwind CSS v4 with oklch design tokens
-- **Deployment:** Vercel
+A Claude Code (and cross-agent) skill that researches a **category** of premium websites, extracts design tokens from each, and merges them into a **single coherent theme** — exported as CSS variables, JSON, and a human-readable rationale doc.
 
-## Commands
-- `npm run dev` — Start dev server
-- `npm run build` — Production build
-- `npm run lint` — ESLint check
-- `npm run typecheck` — TypeScript check
-- `npm run check` — Run lint + typecheck + build
+v1.0 is intentionally narrow: **tokens only, no build**. The skill stops after writing three files. Users apply those tokens to their own app manually (or invoke a downstream build skill).
 
-## Code Style
-- TypeScript strict mode, no `any`
-- Named exports, PascalCase components, camelCase utils
-- Tailwind utility classes, no inline styles
-- 2-space indentation
-- Responsive: mobile-first
+## Positioning
 
-## Design Principles
-- **Pixel-perfect emulation** — match the target's spacing, colors, typography exactly
-- **No personal aesthetic changes during emulation phase** — match 1:1 first, customize later
-- **Real content** — use actual text and assets from the target site, not placeholders
-- **Beauty-first** — every pixel matters
+| Tool | What it does |
+|---|---|
+| `tweakcn.com` | Edit one theme visually in a UI |
+| `JCodesMore/ai-website-cloner-template` (parent) | Pixel-perfect clone of one URL |
+| **`/build-website-inspired` (this)** | Research a category → extract N sites → merge into ONE coherent theme |
 
-## Project Structure
+## How to invoke
+
 ```
-src/
-  app/              # Next.js routes
-  components/       # React components
-    ui/             # shadcn/ui primitives
-    icons.tsx       # Extracted SVG icons as React components
-  lib/
-    utils.ts        # cn() utility (shadcn)
-  types/            # TypeScript interfaces
-  hooks/            # Custom React hooks
-public/
-  images/           # Downloaded images from target site
-  videos/           # Downloaded videos from target site
-  seo/              # Favicons, OG images, webmanifest
-docs/
-  research/         # Inspection output (design tokens, components, layout)
-  design-references/ # Screenshots and visual references
-scripts/            # Asset download scripts
+/build-website-inspired "<category-description-or-vibe>"
+```
+
+Examples:
+- `/build-website-inspired "premium fintech risk dashboard"`
+- `/build-website-inspired "editorial luxury ecommerce"`
+- `/build-website-inspired "calm healthcare portal"`
+- `/build-website-inspired "use mercury.com, brex.com, runway.com"` (direct URLs)
+
+## Phases
+
+The skill has THREE phases, not five:
+
+0. **Category Research** — propose 5-8 reference URLs (`docs/research/REFERENCES.md`)
+1. **Token Extraction** — Playwright MCP, scroll-hydrate, `getComputedStyle()` per site (`docs/research/<hostname>/tokens.json` + `screenshot.png`)
+2. **Curated Merge + Output** — classify → anchor → rule-based overlay → validate → write 3 files, STOP:
+   - `design/DESIGN_TOKENS.md` — human-readable doc with provenance per token
+   - `design/theme.css` — ready-to-paste CSS custom properties (shadcn-compatible)
+   - `design/theme.json` — machine-readable
+
+## Repo layout
+
+```
+.claude/skills/build-website-inspired/
+  SKILL.md                              # Source of truth for the skill
+
+.codex/skills/build-website-inspired/SKILL.md       # Auto-generated (sync-skills.mjs)
+.github/skills/build-website-inspired/SKILL.md      # Auto-generated
+.cursor/commands/build-website-inspired.md          # Auto-generated
+.windsurf/workflows/build-website-inspired.md       # Auto-generated
+.gemini/commands/build-website-inspired.toml        # Auto-generated
+.opencode/commands/build-website-inspired.md        # Auto-generated
+.augment/commands/build-website-inspired.md         # Auto-generated
+.continue/commands/build-website-inspired.md        # Auto-generated
+.amazonq/cli-agents/build-website-inspired.json     # Auto-generated
+
+scripts/
+  sync-skills.mjs                       # Regenerates all platform copies from .claude source
+  sync-agent-rules.sh                   # Regenerates AGENTS.md-derived rules (copilot, cline, etc.)
 ```
 
 ## MOST IMPORTANT NOTES
-- When launching Claude Code agent teams, ALWAYS have each teammate work in their own worktree branch and merge everyone's work at the end, resolving any merge conflicts smartly since you are basically serving the orchestrator role and have full context to our goals, work given, work achieved, and desired outcomes.
-- After editing `AGENTS.md`, run `bash scripts/sync-agent-rules.sh` to regenerate platform-specific instruction files.
-- After editing `.claude/skills/clone-website/SKILL.md`, run `node scripts/sync-skills.mjs` to regenerate the skill for all platforms.
 
-@docs/research/INSPECTION_GUIDE.md
+- **This skill is repo-agnostic.** It does NOT require a Next.js scaffold, `package.json`, or `npm run build`. It writes tokens into whatever repo it's invoked in, under `design/` and `docs/research/`.
+- **The skill stops after Phase 2.** Do not build, scaffold, or dispatch builder agents after writing the three output files. That is the #1 failure mode.
+- **Playwright MCP is required.** Other browser MCPs may work but scroll-hydration is load-bearing for premium sites — test carefully if substituting.
+- After editing `AGENTS.md`, run `bash scripts/sync-agent-rules.sh` to regenerate platform-specific instruction files.
+- After editing `.claude/skills/build-website-inspired/SKILL.md`, run `node scripts/sync-skills.mjs` to regenerate the skill for all platforms.
+
+## Credits
+
+Token extraction technique adapted from [JCodesMore/ai-website-cloner-template](https://github.com/JCodesMore/ai-website-cloner-template). This fork keeps Phase 1 of that pipeline and adds category research + merge, stopping before any build step.

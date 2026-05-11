@@ -23,8 +23,8 @@ body:
       label: Steps to Reproduce
       description: Step-by-step instructions to reproduce the behavior.
       placeholder: |
-        1. Run `/clone-website https://example.com`
-        2. Wait for agents to finish
+        1. Run `/build-website-inspired "premium fintech dashboard"`
+        2. Phase 1 starts extracting from runway.com
         3. See error in terminal...
     validations:
       required: true
@@ -48,9 +48,9 @@ body:
   - type: input
     id: target-url
     attributes:
-      label: Target URL
-      description: The website URL you were trying to clone (if applicable).
-      placeholder: https://example.com
+      label: Category or URLs
+      description: The category description or list of URLs you used.
+      placeholder: "premium fintech risk dashboard"
 
   - type: dropdown
     id: os
@@ -64,20 +64,20 @@ body:
       required: true
 
   - type: input
-    id: node-version
+    id: agent
     attributes:
-      label: Node.js Version
-      description: Run `node -v` to find this.
-      placeholder: v24.x.x
+      label: AI agent used
+      description: Which agent invoked the skill? (Claude Code, Codex, Cursor, etc.)
+      placeholder: Claude Code 1.x.x
     validations:
       required: true
 
   - type: input
-    id: claude-code-version
+    id: playwright-mcp
     attributes:
-      label: Claude Code Version
-      description: Run `claude --version` to find this.
-      placeholder: 1.x.x
+      label: Playwright MCP connected?
+      description: Was Playwright MCP available at invocation time?
+      placeholder: "yes / no"
 
   - type: textarea
     id: additional
